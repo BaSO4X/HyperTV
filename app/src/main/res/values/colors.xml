@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MD3 深色基调（TV 场景固定深色） -->
+    <color name="bg">#0E1112</color>
+    <color name="surface">#191D1E</color>
+    <color name="surface_high">#232829</color>
+
+    <color name="brand">#6FE3C4</color>
+    <color name="brand_dim">#2F6E60</color>
+    <color name="on_surface">#E4EAE9</color>
+    <color name="on_surface_variant">#9BACAA</color>
+
+    <color name="state_ok">#6FE3C4</color>
+    <color name="state_warn">#FFC46B</color>
+    <color name="state_error">#FF7B7B</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="icon_circle_bg">#1F2B29</color>
+</resources>

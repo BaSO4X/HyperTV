@@ -1,9 +1,20 @@
 [versions]
 agp = "9.3.3"
 libxposedApi = "101.0.1"
+libxposedService = "101.0.0"
+dexkit = "2.2.0"
+appcompat = "1.7.1"
+core = "1.16.0"
+material = "1.13.0"
 
 [libraries]
 libxposed-api = { group = "io.github.libxposed", name = "api", version.ref = "libxposedApi" }
+# 模块 UI 侧：拿 LSPosed service（激活状态 + RemotePreferences 写入）
+libxposed-service = { group = "io.github.libxposed", name = "service", version.ref = "libxposedService" }
+dexkit = { group = "org.luckypray", name = "dexkit", version.ref = "dexkit" }
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

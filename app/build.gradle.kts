@@ -44,4 +44,13 @@ android {
 dependencies {
     // 只编译期可见，运行时由框架提供
     compileOnly(libs.libxposed.api)
+
+    // 模块 UI：XposedServiceHelper / XposedService（AAR 自带 XposedService Provider）
+    implementation(libs.libxposed.service)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+
+    // 运行时按结构动态定位宿主类/方法/字段，不依赖混淆名
+    implementation(libs.dexkit)
 }

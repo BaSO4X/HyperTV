@@ -1,4 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HyperTV</string>
+    <string name="app_subtitle">小米电视桌面增强模块</string>
+
+    <string name="status_title">模块状态</string>
+    <string name="status_checking">检测中…</string>
+    <string name="status_checking_detail">正在连接 LSPosed 服务</string>
+
+    <string name="status_active">已激活</string>
+    <string name="status_active_detail">%1$s %2$s · API %3$d · 作用域 %4$s</string>
+
+    <string name="status_no_service">未连接</string>
+    <string name="status_no_service_detail">未检测到 LSPosed 服务，请确认已安装并启用本模块</string>
+
+    <string name="status_api_low">框架版本过低</string>
+    <string name="status_api_low_detail">需要支持 libxposed API 101 的框架，当前 API %1$d</string>
+
+    <string name="status_scope_missing">作用域未勾选</string>
+    <string name="status_scope_missing_detail">请在 LSPosed 中勾选「小米电视桌面」%1$s</string>
+
+    <string name="status_unknown_framework">LSPosed</string>
+    <string name="badge_active">运行中</string>
+    <string name="badge_inactive">未生效</string>
+
+    <string name="section_functions">功能</string>
+
+    <string name="feature_preview_title">首页 · 输入源预览常显</string>
+    <string name="feature_preview_desc">预览窗无需用遥控器选中也持续显示画面，滚动翻页时跟随卡片</string>
+
+    <string name="feature_ads_title">我的应用 · 去广告</string>
+    <string name="feature_ads_desc">移除「我的应用」顶部的推荐广告行，应用列表自动上移补位</string>
+
+    <string name="feature_elder_title">长辈模式 · 只留应用</string>
+    <string name="feature_elder_desc">长辈模式首页只保留应用列表，移除其下的节目推荐行</string>
+
+    <string name="hint_remote">遥控器：上下键移动焦点，OK 键切换开关，返回键退出</string>
+    <string name="hint_saved_locally">已保存；连接 LSPosed 后自动生效</string>
+    <string name="hint_reenter_page">开关已切换，重新进入「我的应用」页生效</string>
+    <string name="hint_reenter_home">开关已切换，返回桌面首页生效</string>
+    <string name="hint_take_effect_now">开关已切换，返回桌面即刻生效</string>
 </resources>
