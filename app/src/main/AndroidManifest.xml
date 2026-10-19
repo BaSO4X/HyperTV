@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 电视端：无触摸屏 / 无 leanback 也能装 -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <!-- 纯 LSPosed 模块：无 Activity、无界面 -->
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/ic_module"
+        android:label="@string/app_name"
+        android:supportsRtl="true" />
+</manifest>
