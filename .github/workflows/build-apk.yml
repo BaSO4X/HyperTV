@@ -25,6 +25,9 @@ jobs:
     name: Assemble APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_HOME: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout
@@ -40,16 +43,31 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install required SDK platforms & build-tools
+      - name: Ensure Android SDK components
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+          set -e
+          SDK_ROOT="${ANDROID_SDK_ROOT}"
+          SDKMGR=$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n1)
+          if [ -z "$SDKMGR" ]; then
+            echo "sdkmanager missing, installing cmdline-tools"
+            mkdir -p /tmp/cmdline-tools
+            curl -sSL -o /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+            unzip -q -o /tmp/cmdtools.zip -d /tmp/cmdline-tools
+            mkdir -p "$SDK_ROOT/cmdline-tools/latest"
+            cp -r /tmp/cmdline-tools/cmdline-tools/* "$SDK_ROOT/cmdline-tools/latest/"
+            SDKMGR="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          fi
+          echo "Using $SDKMGR"
+          yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
+          "$SDKMGR" --install "platform-tools" "platforms;android-36" "build-tools;36.0.0" 2>&1 | tail -n 20
+          echo "$SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> $GITHUB_ENV
+
+      - name: Local properties
+        run: |
+          echo "sdk.dir=${ANDROID_SDK_ROOT}" > local.properties
+          cat local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -57,12 +75,16 @@ jobs:
       - name: Show build environment
         run: |
           ./gradlew --version
-          echo "BUILD_TYPE=${{ github.event.inputs.build_type || 'release' }}" >> $GITHUB_ENV
 
       - name: Build with Gradle
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
         run: |
-          ./gradlew :app:assemble${BUILD_TYPE^} --no-daemon --stacktrace \
-            -Porg.gradle.configuration-cache=false
+          set -e
+          TASK_TYPE=$(echo "$BUILD_TYPE" | sed 's/^./\U&/')
+          echo "Running :app:assemble$TASK_TYPE"
+          ./gradlew ":app:assemble$TASK_TYPE" --no-daemon --stacktrace \
+            -Dorg.gradle.configuration-cache=false
 
       - name: Locate APK artifacts
         id: apk
@@ -71,18 +93,16 @@ jobs:
           mapfile -t FILES < <(find app/build/outputs/apk -name '*.apk' -type f | sort)
           if [ ${#FILES[@]} -eq 0 ]; then
             echo "::error::No APK produced"
+            find app/build/outputs -maxdepth 4 -type f 2>/dev/null || true
             exit 1
           fi
           mkdir -p dist
-          for f in "${FILES[@]}"; do
-            base=$(basename "$f")
-            cp "$f" "dist/$base"
-          done
+          for f in "${FILES[@]}"; do cp "$f" "dist/$(basename "$f")"; done
           ls -la dist
           for f in dist/*.apk; do
             echo "== $f =="
             echo "size: $(stat -c%s "$f") bytes"
-            echo "sha256: $(sha256sum "$f" | cut -d' ' -f1)"
+            sha256sum "$f"
           done
           echo "apk_count=${#FILES[@]}" >> $GITHUB_OUTPUT
 
@@ -99,13 +119,13 @@ jobs:
           {
             echo "## HyperTV APK build"
             echo ""
-            echo "- Build type: \`${{ github.event.inputs.build_type || 'release' }}\`"
+            echo "- Type: \`${{ github.event.inputs.build_type || 'release' }}\`"
             echo "- Commit: \`${{ github.sha }}\`"
-            echo "- APKs produced: ${{ steps.apk.outputs.apk_count }}"
+            echo "- APKs: ${{ steps.apk.outputs.apk_count }}"
             echo ""
-            echo "| file | size (bytes) | sha256 |"
+            echo "| file | bytes | sha256 |"
             echo "| --- | --- | --- |"
             for f in dist/*.apk; do
-              echo "| $(basename "$f") | $(stat -c%s "$f") | \`$(sha256sum "$f" | cut -d' ' -f1)\` |"
+              echo "| $(basename "$f") | $(stat -c%s "$f") | $(sha256sum "$f" | cut -d' ' -f1) |"
             done
           } >> $GITHUB_STEP_SUMMARY
